@@ -11,7 +11,9 @@ import (
 
 var(
 	Cfg *ini.File
+)
 
+type Configuration struct{
 	RunMode string				// 运行模式 dev | release
 	Version string				// 读取版本信息
 
@@ -25,7 +27,7 @@ var(
 	MaxPackageSize int			// 数据包的最大大小
 	WorkerPoolSize int			// 工作池中最多有多少个协程
 	MaxTaskQueueLen int			// 任务队列的最大任务数
-)
+}
 
 func init(){
 	var err error
@@ -33,34 +35,29 @@ func init(){
 	if err!=nil{
 		log.Fatalf("Fail to parse 'conf/app.ini':%v", err)
 	}
-	LoadBase()
-	LoadServer()
 }
 
-/**
-加载基本模块
- */
-func LoadBase(){
-	RunMode = Cfg.Section("").Key("RUN_MODE").MustString("dev")
-	Version = Cfg.Section("").Key("VERSION").MustString("1.0.0")
-}
-
-/**
-加载服务模块
- */
-func LoadServer(){
+func NewConfiguration() *Configuration{
 	sec, err := Cfg.GetSection("server")
 	if err!=nil{
 		log.Fatalf("Fail to get section 'server':%v", err)
 	}
-	Name = sec.Key("NAME").MustString("v1_ZRX")
-	IpVersion = sec.Key("IP_VERSION").MustString("tcp4")
-	IpAddress = sec.Key("IP_ADDRESS").MustString("127.0.0.1")
-	Port = sec.Key("PORT").MustInt()
-	ReadTimeout = time.Duration(sec.Key("READ_TIMEOUT").MustInt(60))*time.Second
-	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60))*time.Second
-	MaxConn = sec.Key("MAX_CONN").MustInt()
-	MaxPackageSize = sec.Key("MAX_PACKAGE_SIZE").MustInt()
-	WorkerPoolSize = sec.Key("WORKER_POOL_SIZE").MustInt()
-	MaxTaskQueueLen = sec.Key("MAX_TASK_QUEUE_LEN").MustInt()
+	return &Configuration{
+		// load basic module
+		RunMode: Cfg.Section("").Key("RUN_MODE").String(),
+		Version: Cfg.Section("").Key("VERSION").String(),
+		// load server module
+		Name: sec.Key("NAME").String(),
+		IpVersion: sec.Key("IP_VERSION").String(),
+		IpAddress: sec.Key("IP_ADDRESS").String(),
+		Port: sec.Key("PORT").MustInt(),
+		ReadTimeout: time.Duration(sec.Key("READ_TIMEOUT").MustInt(60))*time.Second,
+		WriteTimeout: time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60))*time.Second,
+		MaxConn: sec.Key("MAX_CONN").MustInt(),
+		MaxPackageSize: sec.Key("MAX_PACKAGE_SIZE").MustInt(),
+		WorkerPoolSize: sec.Key("WORKER_POOL_SIZE").MustInt(),
+		MaxTaskQueueLen: sec.Key("MAX_TASK_QUEUE_LEN").MustInt(),
+	}
 }
+
+
