@@ -11,6 +11,7 @@ import (
 
 var(
 	Cfg *ini.File
+	Conf *Configuration
 )
 
 type Configuration struct{
