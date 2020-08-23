@@ -28,6 +28,7 @@ func (this *MsgHandler) DoMsgHandler(request ziface.IRequest) {
 	handler, ok := this.Apis[request.MsgID()]
 	if !ok {
 		fmt.Printf("api msgID=%v is not registered", request.MsgID())
+		return
 	}
 	// 根据msgID调用对应的router
 	handler.PreHandle(request)
